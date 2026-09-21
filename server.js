@@ -1,10 +1,16 @@
+require('dotenv').config();
+
 const http = require('http');
 const fs = require('fs');
 const path = require('path');
+const os = require('os');
+
 const mime = require('mime-types');
+const { Filter } = require('bad-words')
+
+const filter = new Filter();
 
 const PORT = process.env.PORT || 3000;
-
 const PUBLIC_DIR = path.join(__dirname, 'public');
 const messages = ["Server booted up successfully"];
 let visitorCount = 0;
@@ -76,19 +82,70 @@ http.createServer((req, res) => {
 
     const DATA_FILE = path.join(__dirname, 'messages.json');
 
+    const action = parsedUrl.searchParams.get('action');
+
+    if (action === 'clear') {
+        const defaultMsg = ["All messages cleared by Admin."];
+        fs.writeFileSync(DATA_FILE, JSON.stringify(defaultMsg, null, 2));
+        res.writeHead(302, { 'Location': '/admin' });
+        return res.end();
+    }
+
     function getSavedMessages() {
         if (!fs.existsSync(DATA_FILE)) return ["Server booted up."];
         return JSON.parse(fs.readFileSync(DATA_FILE));
     }
 
     const newMsg = parsedUrl.searchParams.get('msg');
+
     if (newMsg) {
         const messages = getSavedMessages();
-        messages.push(newMsg);
-        fs.writeFileSync(DATA_FILE, JSON.stringify(messages, null, 2));
+
+        const cleanedInput = newMsg.replace(/\s+/g, '').trim();
+        const compactInput = cleanedInput.replace(/\s+/g, '');
+
+        const filteredMsg = filter.isProfane(compactInput)
+            ? '[Message removed]'
+            : filter.clean(cleanedInput);
+
+        messages.push(filteredMsg);
+        const recentMessages = messages.slice(-100);
+        fs.writeFileSync(DATA_FILE, JSON.stringify(recentMessages, null, 2));
         res.writeHead(302, { Location: '/shoutbox' });
         return res.end();
     }
+
+    if (reqPath === '/shoutbox') {
+        const password = parsedUrl.searchParams.get('password');
+        const shoutboxPassword = process.env.SHOUTBOX_PASSWORD;
+        console.log(password);
+        if (password !== shoutboxPassword) {
+            console.log('Not the correct password');
+            res.writeHead(401, { 'Content-Type': 'text/html' });
+            return res.end(`
+                <h1>401 Unauthorized</h1>
+                <p>Incorrect or missing password</p>
+                <a href="/">Go back and try again</a>
+                `);
+        }
+
+    }
+    if (reqPath === '/admin') {
+        const password = parsedUrl.searchParams.get('password');
+        const adminPassword = process.env.ADMIN_PASSWORD;
+        console.log(password);
+        if (password !== adminPassword) {
+            console.log('Not the correct password');
+            res.writeHead(401, { 'Content-Type': 'text/html' });
+            return res.end(`
+                <h1>401 Unauthorized</h1>
+                <p>Incorrect or missing password</p>
+                <a href="/">Go back and try again</a>
+                `);
+        }
+
+    }
+
     if (reqPath === '/roll') {
         console.log("/roll route accessed");
         let roll = Math.floor(Math.random() * 6) + 1;
@@ -104,6 +161,20 @@ http.createServer((req, res) => {
         res.writeHead(200, { 'Content-Type': 'application/json' });
         return res.end(JSON.stringify(stats));
     }
+
+    if (reqPath === '/api/system') {
+        const systemInfo = {
+            platform: os.platform(),
+            cpus: os.cpus().length,
+            freeMemoryMB: Math.round(os.freemem() / 1024 / 1024),
+            totalMemoryMB: Math.round(os.totalmem() / 1024 / 1024),
+            uptimeMinutes: Math.round(process.uptime() / 60)
+        };
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        return res.end(JSON.stringify(systemInfo, null, 2));
+    }
+
+
     let normalizedPath = reqPath === '/' ? '/index.html' : reqPath;
     if (!path.extname(normalizedPath)) {
         normalizedPath += '.html';
