@@ -12,7 +12,6 @@ const path = require('path');
 const filter = new Filter();
 const app = express();
 
-
 // Trust the X-Forwarded-For header set by hosts like Render, so the rate
 // limiter sees each visitor's real IP instead of the proxy's
 app.set('trust proxy', 1);
@@ -118,15 +117,7 @@ app.post('/login', (req, res) => {
 
 // Logout - destroys the session so req.session.isAuthenticated is gone
 app.post('/logout', (req, res) => {
-    req.session.destroy((err) => {
-        if (err) {
-            console.error('Logout error:', err);
-            return res.status(500).json({
-                success: false,
-                error: 'Logout failed'
-            });
-        }
-        res.clearCookie('connect.sid');
+    req.session.destroy(() => {
         res.json({
             success: true
         });
@@ -135,7 +126,7 @@ app.post('/logout', (req, res) => {
 
 // Example protected route - try visiting this without logging in first
 app.get('/dashboard', requireAuth, (req, res) => {
-    res.send('<h1>Dashboard</h1><p>You are logged in!</p>');
+    res.sendFile(path.join(PUBLIC_DIR, 'dashboard.html'));
 });
 
 app.get('/api/whoami', (req, res) => {
