@@ -8,6 +8,7 @@ const { Filter } = require('bad-words');
 const fs = require('fs');
 const path = require('path');
 
+const crypto = require('crypto');
 
 const filter = new Filter();
 const app = express();
@@ -35,6 +36,19 @@ const GUESTBOOK_FILE = path.join(__dirname, 'guestbook.json');
 function getGuestbookMessages() {
     if (!fs.existsSync(GUESTBOOK_FILE)) return [];
     return JSON.parse(fs.readFileSync(GUESTBOOK_FILE, 'utf8'));
+}
+
+function validateEntry(name, msg) {
+    if (typeof name !== 'string' || typeof msg !== 'string') {
+        return 'Name and message must be text.';
+    }
+    if (name.trim().length < 1 || name.trim().length > 40) {
+        return 'Name must be 1 to 40 characters.';
+    }
+    if (msg.trim().length < 1 || msg.trim().length > 280) {
+        return 'Message must be 1 to 280 characters.';
+    }
+    return null;
 }
 // ==========================================
 // MIDDLEWARE SETUP
@@ -148,23 +162,50 @@ app.get('/api/guestbook', requireAuth, (req, res) => {
     res.json(getGuestbookMessages());
 });
 
-app.post('/api/guestbook', requireAuth, (req, res) => {
-    const { msg } = req.body;
-    if (!msg) {
-        return res.status(400).json({ error: 'Message is required' });
-    }
-    const messages = getGuestbookMessages();
+// // app.post('/api/guestbook', requireAuth, (req, res) => {
+// //     const { msg } = req.body;
+// //     if (!msg) {
+// //         return res.status(400).json({ error: 'Message is required' });
+// //     }
+// //     const messages = getGuestbookMessages();
 
+// //     const cleanedInput = msg.replace(/\s+/g, '').trim();
+// //     const compactInput = cleanedInput.replace(/\s+/g, '');
+// //     if (filter.isProfane(compactInput)) {
+// //         return res.status(400).json({ error: 'Message contains profanity' });
+// //     }
+// //     messages.push(cleanedInput);
+
+// //     fs.writeFileSync(GUESTBOOK_FILE, JSON.stringify(messages.slice(-10), null, 2));
+// //     res.json({ success: true });
+// // });
+app.post('/api/guestbook', requireAuth, (req, res) => {
+    const { name, msg } = req.body;
+
+    const error = validateEntry(name, msg);
+    if (error) {
+        return res.status(400).json({ error: error });
+    }
+
+    const messages = getGuestbookMessages();
     const cleanedInput = msg.replace(/\s+/g, '').trim();
     const compactInput = cleanedInput.replace(/\s+/g, '');
     if (filter.isProfane(compactInput)) {
         return res.status(400).json({ error: 'Message contains profanity' });
     }
-    messages.push(cleanedInput);
 
-    fs.writeFileSync(GUESTBOOK_FILE, JSON.stringify(messages.slice(-10), null, 2));
-    res.json({ success: true });
+    const entry = {
+        id: crypto.randomUUID(),
+        name: name.trim(),
+        msg: cleanedInput,
+        createdAt: new Date().toISOString()
+    };
+
+    messages.push(entry);
+    fs.writeFileSync(GUESTBOOK_FILE, JSON.stringify(messages.slice(-50), null, 2));
+    res.status(201).json(entry);
 });
+
 
 app.get('/', (req, res) => {
     visitorCount++;
