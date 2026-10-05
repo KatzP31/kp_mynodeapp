@@ -223,5 +223,32 @@ app.get('/', (req, res) => {
 // `extensions: ['html']` lets /projects find projects.html without the extension
 // ==========================================
 app.use(express.static(PUBLIC_DIR, { extensions: ['html'] }));
+app.use((req, res) => {
+    if (req.path.startsWith('/api/')) {
+        return res.status(404).json({ error: 'Not found' });
+    }
+    res.status(404).sendFile(path.join(PUBLIC_DIR, '404.html'));
+});
+app.use((err, req, res, next) => {
+    // Full details go to YOU, in the console and the log file
+    const time = new Date().toISOString();
+    console.error(`[${time}] ERROR ${req.method} ${req.path}`, err);
+    fs.appendFile(LOG_FILE, `[${time}] ERROR ${req.method} ${req.path}: ${err.message}\n`, () => { });
 
+    // If a response already started sending, let Express finish up
+    if (res.headersSent) return next(err);
+
+    // Errors with a status under 500 are the user's fault and safe to explain.
+    // Anything else is our fault, so hide the details.
+    const status = err.status || 500;
+    const message = status < 500 ? err.message : 'Something went wrong on our end.';
+
+    if (req.path.startsWith('/api/')) {
+        return res.status(status).json({ error: message });
+    }
+    res.status(status).send('<h1>Something went wrong</h1><p>Please try again later.</p><a href="/">Back to home</a>');
+});
 app.listen(PORT, () => console.log(`Server live on http://localhost:${PORT}`));
+
+
+

@@ -1,0 +1,1300 @@
+/* ===========================
+   FONT
+=========================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&display=swap');
+
+
+/* ===========================
+   VARIABLES
+=========================== */
+
+:root {
+    --purple: #6a3fbf;
+    --purple-dark: #534078;
+
+    --light-bg: #dfc9ea;
+    --dark-bg: #28002e;
+
+    --light-card: rgba(255, 255, 255, 0.75);
+    --dark-card: rgba(255, 255, 255, 0.08);
+
+    --shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+}
+
+
+/* ===========================
+   RESET
+=========================== */
+
+* {
+    box-sizing: border-box;
+}
+
+html,
+body {
+    margin: 0;
+    min-height: 100%;
+}
+
+body {
+    min-height: 100vh;
+    padding: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-family: 'Quicksand', sans-serif;
+    text-align: center;
+    background-color: var(--light-bg);
+    color: #111;
+}
+
+
+/* ===========================
+   DARK MODE
+=========================== */
+
+body.dark-mode {
+    background-color: var(--dark-bg);
+    color: #f5f5f5;
+}
+
+
+/* ===========================
+   MAIN CONTAINERS
+=========================== */
+
+main,
+#dashboard-main {
+    width: 100%;
+    max-width: 900px;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    gap: 25px;
+}
+
+
+/* ===========================
+   HEADINGS
+=========================== */
+
+h1,
+h2,
+h3,
+p {
+    margin: 0;
+}
+
+h1 {
+    font-size: 2.5rem;
+    color: var(--purple);
+
+    transition: color 0.2s ease;
+}
+
+h1:hover {
+    color: var(--purple-dark);
+}
+
+p {
+    font-size: 1.1rem;
+}
+
+
+/* ===========================
+   NAVIGATION
+=========================== */
+
+nav,
+#main-nav,
+#dashboard-nav {
+    width: 100%;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+nav a,
+.nav-link,
+.home-link,
+.projects-link,
+.guestbook-link,
+.dashboard-link,
+#home-link,
+#projects-link,
+#guestbook-link,
+#dashboard-link {
+    display: inline-block;
+    padding: 10px 18px;
+
+    border-radius: 12px;
+
+    background: var(--purple);
+    color: white;
+
+    text-decoration: none;
+    font-weight: 600;
+
+    transition:
+        background 0.2s ease,
+        transform 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+nav a:hover,
+.nav-link:hover,
+.home-link:hover,
+.projects-link:hover,
+.guestbook-link:hover,
+.dashboard-link:hover,
+#home-link:hover,
+#projects-link:hover,
+#guestbook-link:hover,
+#dashboard-link:hover {
+    background: var(--purple-dark);
+
+    transform: translateY(-2px);
+
+    box-shadow: 0 5px 15px rgba(83, 64, 120, 0.25);
+}
+
+/* ===========================
+   SERVER OVERVIEW
+=========================== */
+
+#server-overview {
+    width: 100%;
+    max-width: 750px;
+
+    padding: 30px;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    gap: 15px;
+
+    border-radius: 22px;
+
+    background: rgba(255, 255, 255, 0.5);
+
+    box-shadow: var(--shadow);
+
+    backdrop-filter: blur(10px);
+}
+
+body.dark-mode #server-overview {
+    background: rgba(255, 255, 255, 0.06);
+}
+
+
+/* Server badge */
+
+.server-badge {
+    display: inline-flex;
+    align-items: center;
+
+    gap: 8px;
+
+    padding: 7px 14px;
+
+    border-radius: 50px;
+
+    background: rgba(106, 63, 191, 0.12);
+
+    color: var(--purple);
+
+    font-size: 0.8rem;
+    font-weight: 700;
+
+    letter-spacing: 1px;
+}
+
+
+/* Status dot */
+
+.status-dot {
+    width: 9px;
+    height: 9px;
+
+    border-radius: 50%;
+
+    background: #35b95f;
+
+    box-shadow: 0 0 8px rgba(53, 185, 95, 0.6);
+}
+
+
+/* Overview title */
+
+#overview-title {
+    margin: 0;
+
+    color: var(--purple);
+
+    font-size: 1.7rem;
+}
+
+#overview-text {
+    max-width: 600px;
+
+    margin: 0;
+
+    color: #666;
+
+    line-height: 1.6;
+}
+
+body.dark-mode #overview-text {
+    color: #bbb;
+}
+
+
+/* ===========================
+   FEATURE CARDS
+=========================== */
+
+#feature-grid {
+    width: 100%;
+
+    display: grid;
+
+    grid-template-columns: repeat(3, 1fr);
+
+    gap: 15px;
+
+    margin-top: 8px;
+}
+
+.feature-card {
+    padding: 22px 16px;
+
+    border-radius: 16px;
+
+    background: rgba(255, 255, 255, 0.65);
+
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.07);
+
+    transition:
+        transform 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+.feature-card:hover {
+    transform: translateY(-4px);
+
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+}
+
+body.dark-mode .feature-card {
+    background: rgba(255, 255, 255, 0.07);
+}
+
+
+.feature-card h3 {
+    margin: 0 0 7px;
+
+    color: var(--purple);
+
+    font-size: 1.1rem;
+}
+
+.feature-card p {
+    margin: 0;
+
+    color: #666;
+
+    font-size: 0.9rem;
+
+    line-height: 1.5;
+}
+
+body.dark-mode .feature-card p {
+    color: #bbb;
+}
+
+
+/* ===========================
+   FOOTER
+=========================== */
+
+#main-footer {
+    width: 100%;
+
+    margin-top: 5px;
+
+    padding-top: 15px;
+
+    border-top: 1px solid rgba(0, 0, 0, 0.1);
+
+    text-align: center;
+}
+
+#main-footer p {
+    margin: 0;
+
+    color: #777;
+
+    font-size: 0.85rem;
+}
+
+body.dark-mode #main-footer {
+    border-top-color: rgba(255, 255, 255, 0.1);
+}
+
+body.dark-mode #main-footer p {
+    color: #aaa;
+}
+
+
+/* ===========================
+   MOBILE
+=========================== */
+
+@media (max-width: 600px) {
+
+    #server-overview {
+        padding: 25px 18px;
+    }
+
+    #feature-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .feature-card {
+        width: 100%;
+    }
+}
+
+/* ===========================
+   BUTTONS
+=========================== */
+
+button {
+    border: none;
+
+    border-radius: 12px;
+
+    padding: 12px 22px;
+
+    background: var(--purple);
+    color: white;
+
+    font-family: inherit;
+    font-size: 1rem;
+    font-weight: 600;
+
+    cursor: pointer;
+
+    transition:
+        background 0.2s ease,
+        transform 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+button:hover {
+    background: var(--purple-dark);
+
+    transform: translateY(-2px);
+
+    box-shadow: 0 5px 15px rgba(106, 63, 191, 0.3);
+}
+
+button:active {
+    transform: translateY(0);
+}
+
+/* ===========================
+   HOME PAGE
+=========================== */
+
+#main-title {
+    max-width: 700px;
+    text-align: center;
+}
+
+#status {
+    width: 100%;
+    min-height: 80px;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    gap: 10px;
+}
+
+#status h1,
+#status h2 {
+    color: var(--purple);
+}
+
+#visit-count {
+    font-size: 1.25rem;
+    font-weight: 600;
+}
+
+
+/* ===========================
+   LOGIN
+=========================== */
+
+#login-section {
+    width: 100%;
+    max-width: 400px;
+
+    padding: 30px;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    gap: 18px;
+
+    border-radius: 20px;
+
+    background: var(--light-card);
+
+    box-shadow: var(--shadow);
+
+    backdrop-filter: blur(8px);
+}
+
+/* Make sure the login section actually disappears when hidden */
+#login-section[hidden] {
+    display: none;
+}
+
+body.dark-mode #login-section {
+    background: var(--dark-card);
+}
+
+#login-title {
+    color: var(--purple);
+}
+
+#login-form {
+    width: 100%;
+
+    display: flex;
+    flex-direction: column;
+
+    gap: 14px;
+}
+
+#password {
+    width: 100%;
+
+    padding: 13px 15px;
+
+    border: 2px solid var(--purple);
+    border-radius: 12px;
+
+    background: white;
+    color: #222;
+
+    font-family: inherit;
+    font-size: 1rem;
+}
+
+#password:focus {
+    outline: none;
+
+    box-shadow: 0 0 0 4px rgba(106, 63, 191, 0.15);
+}
+
+body.dark-mode #password {
+    background: #3d1046;
+    color: white;
+}
+
+.remember-me-checkbox {
+    accent-color: var(--purple);
+}
+
+#login-message {
+    min-height: 20px;
+
+    color: var(--purple);
+    font-weight: 600;
+}
+
+/* ===========================
+   GUESTBOOK
+=========================== */
+
+#guestbook-main {
+    width: 100%;
+    max-width: 850px;
+    gap: 25px;
+}
+
+
+/* ===========================
+   GUESTBOOK TITLE
+=========================== */
+
+#guestbook-title {
+    margin: 0;
+    font-size: 2.8rem;
+    color: var(--purple);
+}
+
+
+/* ===========================
+   GUESTBOOK MESSAGES
+=========================== */
+
+#guestbook-list {
+    width: 100%;
+    max-width: 750px;
+
+    margin: 0;
+    padding: 18px;
+
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+
+    list-style: none;
+
+    border-radius: 20px;
+
+    background: rgba(255, 255, 255, 0.45);
+
+    box-shadow: var(--shadow);
+
+    backdrop-filter: blur(8px);
+}
+
+body.dark-mode #guestbook-list {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+
+/* ===========================
+   INDIVIDUAL MESSAGE
+=========================== */
+
+#guestbook-list li {
+    width: 100%;
+
+    padding: 18px 20px;
+
+    border-left: 4px solid var(--purple);
+    border-radius: 14px;
+
+    background: rgba(255, 255, 255, 0.9);
+
+    text-align: left;
+    word-break: break-word;
+
+    line-height: 1.5;
+
+    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.08);
+
+    transition:
+        transform 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+#guestbook-list li:hover {
+    transform: translateY(-2px);
+
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.12);
+}
+
+body.dark-mode #guestbook-list li {
+    background: rgba(255, 255, 255, 0.08);
+    color: #f5f5f5;
+}
+
+
+/* ===========================
+   MESSAGE NAME
+=========================== */
+
+#guestbook-list li strong {
+    color: var(--purple);
+
+    font-size: 1rem;
+    font-weight: 700;
+}
+
+body.dark-mode #guestbook-list li strong {
+    color: #b99ae8;
+}
+
+
+/* ===========================
+   MESSAGE DATE
+=========================== */
+
+#guestbook-list li small {
+    margin-left: 6px;
+
+    color: #777;
+
+    font-size: 0.78rem;
+    font-weight: 500;
+}
+
+body.dark-mode #guestbook-list li small {
+    color: #aaa;
+}
+
+
+/* ===========================
+   MESSAGE TEXT
+=========================== */
+
+#guestbook-list li p {
+    margin: 8px 0 0;
+
+    color: #333;
+
+    font-size: 1rem;
+    line-height: 1.6;
+
+    white-space: pre-wrap;
+}
+
+body.dark-mode #guestbook-list li p {
+    color: #eee;
+}
+
+
+/* ===========================
+   GUESTBOOK FORM
+=========================== */
+
+#guestbook-form {
+    width: 100%;
+    max-width: 750px;
+
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+
+    gap: 8px;
+
+    padding: 22px;
+
+    border-radius: 20px;
+
+    background: rgba(255, 255, 255, 0.7);
+
+    box-shadow: var(--shadow);
+
+    backdrop-filter: blur(8px);
+
+    text-align: left;
+}
+
+body.dark-mode #guestbook-form {
+    background: rgba(255, 255, 255, 0.07);
+}
+
+
+/* ===========================
+   FORM LABELS
+=========================== */
+
+#guestbook-form label {
+    margin-top: 4px;
+
+    color: #444;
+
+    font-size: 0.95rem;
+    font-weight: 700;
+}
+
+body.dark-mode #guestbook-form label {
+    color: #ddd;
+}
+
+
+/* ===========================
+   NAME INPUT
+=========================== */
+
+#guestbook-form input {
+    width: 100%;
+
+    padding: 13px 15px;
+
+    border: 2px solid transparent;
+    border-radius: 12px;
+
+    background: rgba(255, 255, 255, 0.95);
+    color: #222;
+
+    font-family: inherit;
+    font-size: 1rem;
+
+    transition:
+        border-color 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+#guestbook-form input:focus {
+    outline: none;
+
+    border-color: var(--purple);
+
+    box-shadow: 0 0 0 3px rgba(106, 63, 191, 0.15);
+}
+
+body.dark-mode #guestbook-form input {
+    background: #3d1046;
+    color: white;
+}
+
+
+/* ===========================
+   MESSAGE TEXTAREA
+=========================== */
+
+#guestbook-form textarea {
+    width: 100%;
+    min-height: 130px;
+
+    padding: 13px 15px;
+
+    resize: vertical;
+
+    border: 2px solid transparent;
+    border-radius: 12px;
+
+    background: rgba(255, 255, 255, 0.95);
+    color: #222;
+
+    font-family: inherit;
+    font-size: 1rem;
+    line-height: 1.5;
+
+    transition:
+        border-color 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+#guestbook-form textarea:focus {
+    outline: none;
+
+    border-color: var(--purple);
+
+    box-shadow: 0 0 0 3px rgba(106, 63, 191, 0.15);
+}
+
+body.dark-mode #guestbook-form textarea {
+    background: #3d1046;
+    color: white;
+}
+
+
+/* ===========================
+   FORM PLACEHOLDERS
+=========================== */
+
+#guestbook-form input::placeholder,
+#guestbook-form textarea::placeholder {
+    color: #888;
+}
+
+body.dark-mode #guestbook-form input::placeholder,
+body.dark-mode #guestbook-form textarea::placeholder {
+    color: #bbb;
+}
+
+
+/* ===========================
+   POST BUTTON
+=========================== */
+
+#guestbook-form button {
+    width: 100%;
+
+    margin-top: 8px;
+}
+
+
+/* ===========================
+   FORM ERROR
+=========================== */
+
+#form-error {
+    width: 100%;
+    max-width: 750px;
+
+    min-height: 20px;
+
+    margin: 0;
+
+    color: #c0392b;
+
+    font-size: 0.95rem;
+    font-weight: 600;
+
+    text-align: center;
+}
+
+body.dark-mode #form-error {
+    color: #ff8f8f;
+}
+
+
+/* ===========================
+   GUESTBOOK MOBILE
+=========================== */
+
+@media (max-width: 600px) {
+
+    #guestbook-main {
+        gap: 20px;
+    }
+
+    #guestbook-title {
+        font-size: 2.2rem;
+    }
+
+    #guestbook-list {
+        padding: 12px;
+    }
+
+    #guestbook-list li {
+        padding: 15px;
+    }
+
+    #guestbook-list li small {
+        display: block;
+
+        margin: 4px 0 0;
+    }
+
+    #guestbook-form {
+        padding: 18px;
+    }
+
+    #guestbook-form textarea {
+        min-height: 120px;
+    }
+}
+
+.dashboard-button {
+    display: inline-block;
+
+    padding: 12px 24px;
+
+    background-color: #6a3fbf;
+    color: white;
+
+    border-radius: 12px;
+
+    text-decoration: none;
+
+    font-family: inherit;
+    font-size: 1rem;
+    font-weight: 600;
+
+    transition: all 0.2s ease;
+}
+
+.dashboard-button:hover {
+    background-color: #534078;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(106, 63, 191, 0.3);
+}
+
+/* ===========================
+   DASHBOARD SUBTITLE
+=========================== */
+
+#dashboard-subtitle {
+    max-width: 650px;
+
+    margin-top: -15px;
+
+    color: #666;
+
+    font-size: 1.05rem;
+}
+
+body.dark-mode #dashboard-subtitle {
+    color: #bbb;
+}
+
+
+/* ===========================
+   DASHBOARD STATUS
+=========================== */
+
+#dashboard-status {
+    width: 100%;
+    max-width: 700px;
+
+    display: flex;
+    flex-direction: column;
+
+    gap: 18px;
+
+    text-align: center;
+}
+
+#dashboard-status h2,
+#quick-actions h2,
+#server-info h2,
+#dashboard-about h2 {
+    margin: 0;
+
+    color: var(--purple);
+
+    font-size: 1.5rem;
+}
+
+
+/* Status cards */
+
+#status-grid {
+    width: 100%;
+
+    display: grid;
+
+    grid-template-columns: repeat(3, 1fr);
+
+    gap: 15px;
+}
+
+.status-card {
+    padding: 22px 15px;
+
+    border-radius: 16px;
+
+    background: rgba(255, 255, 255, 0.55);
+
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+
+    backdrop-filter: blur(8px);
+
+    transition:
+        transform 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+.status-card:hover {
+    transform: translateY(-3px);
+
+    box-shadow: 0 7px 20px rgba(0, 0, 0, 0.12);
+}
+
+.status-card h3 {
+    margin: 0 0 8px;
+
+    font-size: 0.9rem;
+
+    color: #777;
+
+    text-transform: uppercase;
+
+    letter-spacing: 1px;
+}
+
+.status-card p {
+    margin: 0;
+
+    color: var(--purple);
+
+    font-size: 1.15rem;
+
+    font-weight: 700;
+}
+
+body.dark-mode .status-card {
+    background: rgba(255, 255, 255, 0.07);
+}
+
+body.dark-mode .status-card h3 {
+    color: #aaa;
+}
+
+
+/* ===========================
+   QUICK ACTIONS
+=========================== */
+
+#quick-actions {
+    width: 100%;
+    max-width: 700px;
+
+    display: flex;
+    flex-direction: column;
+
+    gap: 18px;
+
+    text-align: center;
+}
+
+#action-grid {
+    width: 100%;
+
+    display: grid;
+
+    grid-template-columns: repeat(3, 1fr);
+
+    gap: 15px;
+}
+
+
+/* Dashboard cards */
+
+.dashboard-card {
+    padding: 22px;
+
+    border-radius: 16px;
+
+    background: rgba(255, 255, 255, 0.55);
+
+    color: inherit;
+
+    text-decoration: none;
+
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+
+    backdrop-filter: blur(8px);
+
+    transition:
+        transform 0.2s ease,
+        box-shadow 0.2s ease,
+        background 0.2s ease;
+}
+
+.dashboard-card:hover {
+    transform: translateY(-4px);
+
+    background: rgba(255, 255, 255, 0.8);
+
+    box-shadow: 0 8px 22px rgba(0, 0, 0, 0.12);
+}
+
+.dashboard-card h3 {
+    margin: 0 0 8px;
+
+    color: var(--purple);
+
+    font-size: 1.15rem;
+}
+
+.dashboard-card p {
+    margin: 0;
+
+    color: #666;
+
+    font-size: 0.95rem;
+
+    line-height: 1.5;
+}
+
+body.dark-mode .dashboard-card {
+    background: rgba(255, 255, 255, 0.07);
+}
+
+body.dark-mode .dashboard-card:hover {
+    background: rgba(255, 255, 255, 0.12);
+}
+
+body.dark-mode .dashboard-card p {
+    color: #bbb;
+}
+
+
+/* ===========================
+   SERVER INFORMATION
+=========================== */
+
+#server-info {
+    width: 100%;
+    max-width: 700px;
+
+    display: flex;
+    flex-direction: column;
+
+    gap: 18px;
+
+    text-align: center;
+}
+
+#server-info-list {
+    width: 100%;
+
+    overflow: hidden;
+
+    border-radius: 16px;
+
+    background: rgba(255, 255, 255, 0.55);
+
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+
+    backdrop-filter: blur(8px);
+}
+
+.info-row {
+    display: flex;
+
+    justify-content: space-between;
+    align-items: center;
+
+    padding: 15px 20px;
+
+    border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+
+    text-align: left;
+}
+
+.info-row:last-child {
+    border-bottom: none;
+}
+
+.info-row span {
+    color: #666;
+
+    font-size: 0.95rem;
+}
+
+.info-row strong {
+    color: var(--purple);
+
+    font-weight: 700;
+}
+
+body.dark-mode #server-info-list {
+    background: rgba(255, 255, 255, 0.07);
+}
+
+body.dark-mode .info-row {
+    border-bottom-color: rgba(255, 255, 255, 0.08);
+}
+
+body.dark-mode .info-row span {
+    color: #bbb;
+}
+
+
+/* ===========================
+   DASHBOARD ABOUT
+=========================== */
+
+#dashboard-about {
+    width: 100%;
+    max-width: 700px;
+
+    padding: 25px;
+
+    display: flex;
+    flex-direction: column;
+
+    gap: 12px;
+
+    border-radius: 16px;
+
+    background: rgba(255, 255, 255, 0.45);
+
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+
+    backdrop-filter: blur(8px);
+
+    text-align: center;
+}
+
+#dashboard-about p {
+    color: #666;
+
+    line-height: 1.6;
+}
+
+body.dark-mode #dashboard-about {
+    background: rgba(255, 255, 255, 0.06);
+}
+
+body.dark-mode #dashboard-about p {
+    color: #bbb;
+}
+
+
+/* ===========================
+   DASHBOARD MOBILE
+=========================== */
+
+@media (max-width: 600px) {
+
+    #status-grid,
+    #action-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .status-card,
+    .dashboard-card {
+        width: 100%;
+    }
+
+    .info-row {
+        padding: 14px 16px;
+
+        gap: 15px;
+    }
+
+    #dashboard-about {
+        padding: 20px;
+    }
+}
+
+/* ===========================
+404 PAGE
+=========================== */
+
+.error-code {
+    font-size: 6rem;
+    font-weight: 700;
+    color: var(--purple);
+    line-height: 1;
+}
+
+.error-message {
+    max-width: 500px;
+    color: #666;
+    font-size: 1.1rem;
+    line-height: 1.6;
+}
+
+body.dark-mode .error-message {
+    color: #bbb;
+}
+
+.back-home-link {
+    display: inline-block;
+    margin-top: 15px;
+    padding: 12px 24px;
+
+    background: var(--purple);
+    color: white;
+
+    border-radius: 12px;
+
+    text-decoration: none;
+    font-weight: 600;
+
+    transition: all 0.2s ease;
+}
+
+.back-home-link:hover {
+    background: var(--purple-dark);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(106, 63, 191, 0.3);
+}

@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+    <link rel="stylesheet" href="express_style.css">
+</head>
+
+<body>
+    <main id="dashboard-main">
+        <h1 id="dashboard-title">Welcome to the dashboard!</h1>
+        <p id="dashboard-subtitle">
+            Manage & view your server from one place.
+        </p>
+        <nav id="dashboard-nav">
+            <a href="/" id="home-link">Home</a>
+            <a href="/guestbook" id="guestbook-link" class="nav-link">Guestbook</a>
+            <a href="/dashboard" id="dashboard-link" class="nav-link">Dashboard</a>
+            <button id="logout-button" class="dashboard-button" type="button">
+                Log Out
+            </button>
+        </nav>
+        <section id="dashboard-status">
+            <h2 id="status-title">Server Status</h2>
+            <div id="status-grid">
+                <div class="status-card">
+                    <h3>Status</h3>
+                    <p id="status-text">ONLINE</p>
+                </div>
+                <div class="status-card">
+                    <h3>Authentication</h3>
+                    <p id="auth-status">LOGGED IN</p>
+                </div>
+                <div class="status-card">
+                    <h3>Server</h3>
+                    <p id="server-status">RUNNING</p>
+                </div>
+            </div>
+        </section>
+        <section id="quick-actions">
+            <h2>Quick Actions</h2>
+            <div id="action-grid">
+                <a href="/" class="dashboard-card">
+                    <h3>Home</h3>
+                    <p>Return to the main page.</p>
+                </a>
+                <a href="/guestbook" class="dashboard-card">
+                    <h3>Guestbook</h3>
+                    <p>View and post guestbook messages.</p>
+                </a>
+                <a href="/dashboard" class="dashboard-card">
+                    <h3>Dashboard</h3>
+                    <p>View your server dashboard.</p>
+                </a>
+            </div>
+        </section>
+        <section id="server-info">
+            <h2>Server Information</h2>
+            <div id="server-info-list">
+                <div class="info-row">
+                    <span>Platform</span>
+                    <strong>Node.js</strong>
+                </div>
+                <div class="info-row">
+                    <span>Framework</span>
+                    <strong>Express</strong>
+                </div>
+                <div class="info-row">
+                    <span>Authentication</span>
+                    <strong>Session Based</strong>
+                </div>
+                <div class="info-row">
+                    <span>Guestbook</span>
+                    <strong>Enabled</strong>
+                </div>
+                <div class="info-row">
+                    <span>Rate Limiting</span>
+                    <strong>Enabled</strong>
+                </div>
+            </div>
+        </section>
+        <section id="dashboard-about">
+            <h2>About</h2>
+            <p>
+                This dashboard provides access to the features
+                and services running on this Express server.
+            </p>
+        </section>
+    </main>
+    <script>
+        const logoutButton = document.querySelector('#logout-button');
+        logoutButton.addEventListener('click', async () => {
+            const response = await fetch('/logout', {
+                method: 'POST'
+            });
+            const data = await response.json().catch(() => ({
+                success: false
+            }));
+            if (data.success) {
+                window.location.href = '/';
+            }
+        });
+    </script>
+</body>
+
+</html>
