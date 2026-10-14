@@ -1965,3 +1965,9 @@
 [2026-10-13T13:21:47.600Z] GET /.well-known/appspecific/com.chrome.devtools.json
 [2026-10-13T13:21:47.610Z] GET /api/whoami
 [2026-10-13T13:21:47.619Z] GET /favicon.png
+[2026-10-14T12:26:23.056Z] GET /
+[2026-10-14T12:26:23.110Z] GET /express_style.css
+[2026-10-14T12:26:23.113Z] GET /js/login.js
+[2026-10-14T12:26:23.114Z] GET /js/logout.js
+[2026-10-14T12:26:27.417Z] GET /api/whoami
+[2026-10-14T12:26:27.490Z] GET /favicon.png
