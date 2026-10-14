@@ -4,7 +4,6 @@
 
 @import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&display=swap');
 
-
 /* ===========================
    VARIABLES
 =========================== */
@@ -22,7 +21,6 @@
     --shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
 }
 
-
 /* ===========================
    RESET
 =========================== */
@@ -39,16 +37,22 @@ body {
 
 body {
     min-height: 100vh;
-    padding: 20px;
+
+    padding: 40px 20px;
+
     display: flex;
+    flex-direction: column;
+
     justify-content: center;
     align-items: center;
+
     font-family: 'Quicksand', sans-serif;
+
     text-align: center;
+
     background-color: var(--light-bg);
     color: #111;
 }
-
 
 /* ===========================
    DARK MODE
@@ -58,7 +62,6 @@ body.dark-mode {
     background-color: var(--dark-bg);
     color: #f5f5f5;
 }
-
 
 /* ===========================
    MAIN CONTAINERS
@@ -77,33 +80,31 @@ main,
     gap: 25px;
 }
 
-
 /* ===========================
    HEADINGS
 =========================== */
 
-h1,
+header,
 h2,
 h3,
 p {
     margin: 0;
 }
 
-h1 {
+header {
     font-size: 2.5rem;
     color: var(--purple);
 
     transition: color 0.2s ease;
 }
 
-h1:hover {
+header:hover {
     color: var(--purple-dark);
 }
 
 p {
     font-size: 1.1rem;
 }
-
 
 /* ===========================
    NAVIGATION
@@ -128,6 +129,7 @@ nav a,
 .projects-link,
 .guestbook-link,
 .dashboard-link,
+.space-link,
 #home-link,
 #projects-link,
 #guestbook-link,
@@ -155,6 +157,7 @@ nav a:hover,
 .projects-link:hover,
 .guestbook-link:hover,
 .dashboard-link:hover,
+.space-link:hover,
 #home-link:hover,
 #projects-link:hover,
 #guestbook-link:hover,
@@ -195,9 +198,6 @@ body.dark-mode #server-overview {
     background: rgba(255, 255, 255, 0.06);
 }
 
-
-/* Server badge */
-
 .server-badge {
     display: inline-flex;
     align-items: center;
@@ -218,9 +218,6 @@ body.dark-mode #server-overview {
     letter-spacing: 1px;
 }
 
-
-/* Status dot */
-
 .status-dot {
     width: 9px;
     height: 9px;
@@ -231,9 +228,6 @@ body.dark-mode #server-overview {
 
     box-shadow: 0 0 8px rgba(53, 185, 95, 0.6);
 }
-
-
-/* Overview title */
 
 #overview-title {
     margin: 0;
@@ -256,7 +250,6 @@ body.dark-mode #server-overview {
 body.dark-mode #overview-text {
     color: #bbb;
 }
-
 
 /* ===========================
    FEATURE CARDS
@@ -321,7 +314,6 @@ body.dark-mode .feature-card p {
     color: #bbb;
 }
 
-
 /* ===========================
    FOOTER
 =========================== */
@@ -353,7 +345,6 @@ body.dark-mode #main-footer {
 body.dark-mode #main-footer p {
     color: #aaa;
 }
-
 
 /* ===========================
    MOBILE
@@ -443,7 +434,6 @@ button:active {
     font-weight: 600;
 }
 
-
 /* ===========================
    LOGIN
 =========================== */
@@ -469,7 +459,6 @@ button:active {
     backdrop-filter: blur(8px);
 }
 
-/* Make sure the login section actually disappears when hidden */
 #login-section[hidden] {
     display: none;
 }
@@ -538,7 +527,6 @@ body.dark-mode #password {
     gap: 25px;
 }
 
-
 /* ===========================
    GUESTBOOK TITLE
 =========================== */
@@ -548,7 +536,6 @@ body.dark-mode #password {
     font-size: 2.8rem;
     color: var(--purple);
 }
-
 
 /* ===========================
    GUESTBOOK MESSAGES
@@ -579,7 +566,6 @@ body.dark-mode #password {
 body.dark-mode #guestbook-list {
     background: rgba(255, 255, 255, 0.05);
 }
-
 
 /* ===========================
    INDIVIDUAL MESSAGE
@@ -618,7 +604,6 @@ body.dark-mode #guestbook-list li {
     color: #f5f5f5;
 }
 
-
 /* ===========================
    MESSAGE NAME
 =========================== */
@@ -633,7 +618,6 @@ body.dark-mode #guestbook-list li {
 body.dark-mode #guestbook-list li strong {
     color: #b99ae8;
 }
-
 
 /* ===========================
    MESSAGE DATE
@@ -651,7 +635,6 @@ body.dark-mode #guestbook-list li strong {
 body.dark-mode #guestbook-list li small {
     color: #aaa;
 }
-
 
 /* ===========================
    MESSAGE TEXT
@@ -671,7 +654,6 @@ body.dark-mode #guestbook-list li small {
 body.dark-mode #guestbook-list li p {
     color: #eee;
 }
-
 
 /* ===========================
    GUESTBOOK FORM
@@ -704,7 +686,6 @@ body.dark-mode #guestbook-form {
     background: rgba(255, 255, 255, 0.07);
 }
 
-
 /* ===========================
    FORM LABELS
 =========================== */
@@ -721,7 +702,6 @@ body.dark-mode #guestbook-form {
 body.dark-mode #guestbook-form label {
     color: #ddd;
 }
-
 
 /* ===========================
    NAME INPUT
@@ -758,7 +738,6 @@ body.dark-mode #guestbook-form input {
     background: #3d1046;
     color: white;
 }
-
 
 /* ===========================
    MESSAGE TEXTAREA
@@ -800,7 +779,6 @@ body.dark-mode #guestbook-form textarea {
     color: white;
 }
 
-
 /* ===========================
    FORM PLACEHOLDERS
 =========================== */
@@ -815,7 +793,6 @@ body.dark-mode #guestbook-form textarea::placeholder {
     color: #bbb;
 }
 
-
 /* ===========================
    POST BUTTON
 =========================== */
@@ -825,7 +802,6 @@ body.dark-mode #guestbook-form textarea::placeholder {
 
     margin-top: 8px;
 }
-
 
 /* ===========================
    FORM ERROR
@@ -850,7 +826,6 @@ body.dark-mode #guestbook-form textarea::placeholder {
 body.dark-mode #form-error {
     color: #ff8f8f;
 }
-
 
 /* ===========================
    GUESTBOOK MOBILE
@@ -932,7 +907,6 @@ body.dark-mode #dashboard-subtitle {
     color: #bbb;
 }
 
-
 /* ===========================
    DASHBOARD STATUS
 =========================== */
@@ -940,12 +914,9 @@ body.dark-mode #dashboard-subtitle {
 #dashboard-status {
     width: 100%;
     max-width: 700px;
-
     display: flex;
     flex-direction: column;
-
     gap: 18px;
-
     text-align: center;
 }
 
@@ -954,22 +925,14 @@ body.dark-mode #dashboard-subtitle {
 #server-info h2,
 #dashboard-about h2 {
     margin: 0;
-
     color: var(--purple);
-
     font-size: 1.5rem;
 }
 
-
-/* Status cards */
-
 #status-grid {
     width: 100%;
-
     display: grid;
-
     grid-template-columns: repeat(3, 1fr);
-
     gap: 15px;
 }
 
@@ -1025,7 +988,6 @@ body.dark-mode .status-card h3 {
     color: #aaa;
 }
 
-
 /* ===========================
    QUICK ACTIONS
 =========================== */
@@ -1051,9 +1013,6 @@ body.dark-mode .status-card h3 {
 
     gap: 15px;
 }
-
-
-/* Dashboard cards */
 
 .dashboard-card {
     padding: 22px;
@@ -1113,7 +1072,6 @@ body.dark-mode .dashboard-card:hover {
 body.dark-mode .dashboard-card p {
     color: #bbb;
 }
-
 
 /* ===========================
    SERVER INFORMATION
@@ -1186,7 +1144,6 @@ body.dark-mode .info-row span {
     color: #bbb;
 }
 
-
 /* ===========================
    DASHBOARD ABOUT
 =========================== */
@@ -1226,7 +1183,6 @@ body.dark-mode #dashboard-about {
 body.dark-mode #dashboard-about p {
     color: #bbb;
 }
-
 
 /* ===========================
    DASHBOARD MOBILE
@@ -1297,4 +1253,235 @@ body.dark-mode .error-message {
     background: var(--purple-dark);
     transform: translateY(-2px);
     box-shadow: 0 5px 15px rgba(106, 63, 191, 0.3);
+}
+
+/* ===========================
+   SPACE PICTURE OF THE DAY
+=========================== */
+
+main {
+    width: 100%;
+    max-width: 1000px;
+    margin: 0 auto;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    gap: 25px;
+}
+
+#space-form {
+    width: 100%;
+    max-width: 600px;
+
+    padding: 24px;
+
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+
+    gap: 12px;
+
+    border-radius: 20px;
+
+    background: rgba(255, 255, 255, 0.65);
+
+    box-shadow: var(--shadow);
+
+    backdrop-filter: blur(10px);
+}
+
+body.dark-mode #space-form {
+    background: rgba(255, 255, 255, 0.07);
+}
+
+#space-form label {
+    font-weight: 700;
+    color: var(--purple);
+}
+
+#date {
+    padding: 12px 14px;
+
+    border: 2px solid transparent;
+    border-radius: 12px;
+
+    font-family: inherit;
+    font-size: 1rem;
+
+    background: white;
+    color: #222;
+
+    transition:
+        border-color 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+#date:focus {
+    outline: none;
+
+    border-color: var(--purple);
+
+    box-shadow: 0 0 0 4px rgba(106, 63, 191, 0.15);
+}
+
+body.dark-mode #date {
+    background: #3d1046;
+    color: white;
+}
+
+/* Status Messages */
+
+#status {
+    min-height: 30px;
+    color: var(--purple);
+    font-weight: 700;
+}
+
+/* Result Card */
+
+#result {
+    width: 100%;
+    max-width: 950px;
+    padding: 28px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 18px;
+    border-radius: 24px;
+    background: rgba(255, 255, 255, 0.65);
+    box-shadow: var(--shadow);
+    backdrop-filter: blur(10px);
+}
+
+body.dark-mode #result {
+    background: rgba(255, 255, 255, 0.07);
+}
+
+#result[hidden] {
+    display: none;
+}
+
+#title {
+    margin: 0;
+
+    color: var(--purple);
+
+    font-size: 2rem;
+}
+
+#date-shown {
+    color: #777;
+    font-weight: 600;
+}
+
+body.dark-mode #date-shown {
+    color: #bbb;
+}
+
+/* NASA Image */
+
+#picture {
+    width: 100%;
+    max-width: 100%;
+    height: auto;
+
+    border-radius: 18px;
+
+    object-fit: cover;
+
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+
+    transition:
+        transform 0.25s ease,
+        box-shadow 0.25s ease;
+}
+
+#picture:hover {
+    transform: scale(1.01);
+
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.2);
+}
+
+/* Description */
+
+#description {
+    max-width: 800px;
+
+    color: #444;
+
+    text-align: left;
+
+    line-height: 1.8;
+}
+
+body.dark-mode #description {
+    color: #ddd;
+}
+
+/* NASA Link */
+
+#nasa-link {
+    display: inline-block;
+
+    padding: 12px 20px;
+
+    border-radius: 12px;
+
+    background: var(--purple);
+    color: white;
+
+    text-decoration: none;
+    font-weight: 600;
+
+    transition:
+        background 0.2s ease,
+        transform 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+#nasa-link:hover {
+    background: var(--purple-dark);
+
+    transform: translateY(-2px);
+
+    box-shadow: 0 5px 15px rgba(106, 63, 191, 0.3);
+}
+
+/* Page Title */
+
+h1 {
+    margin-bottom: 25px;
+
+    color: var(--purple);
+
+    font-size: 2.5rem;
+}
+
+/* Mobile */
+
+@media (max-width: 600px) {
+
+    #space-form {
+        flex-direction: column;
+    }
+
+    #date,
+    #space-form button {
+        width: 100%;
+    }
+
+    #result {
+        padding: 20px;
+    }
+
+    #title {
+        font-size: 1.5rem;
+    }
+
+    #description {
+        text-align: center;
+    }
 }

@@ -10,7 +10,7 @@
 
 <body>
     <main id="dashboard-main">
-        <h1 id="dashboard-title">Welcome to the dashboard!</h1>
+        <header id="dashboard-title">Welcome to the dashboard!</header>
         <p id="dashboard-subtitle">
             Manage & view your server from one place.
         </p>
@@ -89,7 +89,7 @@
             </p>
         </section>
     </main>
-    <script>
+    <!-- <script>
         const logoutButton = document.querySelector('#logout-button');
         logoutButton.addEventListener('click', async () => {
             const response = await fetch('/logout', {
@@ -102,7 +102,8 @@
                 window.location.href = '/';
             }
         });
-    </script>
+    </script> -->
+    <script src="/js/logout.js"></script>
 </body>
 
 </html>

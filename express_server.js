@@ -9,14 +9,28 @@ const fs = require('fs');
 const path = require('path');
 
 const crypto = require('crypto');
+const helmet = require('helmet');
 
 const filter = new Filter();
 const app = express();
 
+const apodCache = new Map();
+const TODAY_MAX_AGE = 60 * 60 * 1000; // 1 hour in milliseconds
+const MAX_CACHE_SIZE = 100;
+
+
+
 // Trust the X-Forwarded-For header set by hosts like Render, so the rate
 // limiter sees each visitor's real IP instead of the proxy's
 app.set('trust proxy', 1);
-
+// app.use(helmet({ contentSecurityPolicy: false }));
+app.use(helmet({
+    contentSecurityPolicy: {
+        directives: {
+            imgSrc: ["'self'", 'data:', 'https://assets.science.nasa.gov']
+        }
+    }
+}));
 const PORT = process.env.PORT || 3000;
 const PUBLIC_DIR = path.join(__dirname, 'public');
 const LOG_FILE = path.join(__dirname, 'server.log');
@@ -113,6 +127,7 @@ app.get('/api/hello', (req, res) => {
 
 // Exposes the visitor count as JSON, e.g. for a frontend script to display
 app.get('/api/stats', (req, res) => {
+    res.set('Cache-Control', 'no-store');
     res.json({ visitorCount });
 });
 
@@ -143,6 +158,14 @@ app.get('/dashboard', requireAuth, (req, res) => {
     res.sendFile(path.join(PUBLIC_DIR, 'dashboard.html'));
 });
 
+app.get('/api/headers-demo', (req, res) => {
+    res.set('X-Student-Name', 'Katz Paniagua');
+    res.json({
+        browser: req.get('User-Agent'),
+        languages: req.get('Accept-Language'),
+        allRequestHeaders: req.headers
+    });
+});
 app.get('/api/whoami', (req, res) => {
     res.json({ loggedIn: !!req.session.isAuthenticated });
 });
@@ -188,7 +211,9 @@ app.post('/api/guestbook', requireAuth, (req, res) => {
     }
 
     const messages = getGuestbookMessages();
-    const cleanedInput = msg.replace(/\s+/g, '').trim();
+    // const cleanedInput = msg.replace(/\s+/g, '').trim();
+    // const compactInput = cleanedInput.replace(/\s+/g, '');
+    const cleanedInput = msg.trim();
     const compactInput = cleanedInput.replace(/\s+/g, '');
     if (filter.isProfane(compactInput)) {
         return res.status(400).json({ error: 'Message contains profanity' });
@@ -216,6 +241,107 @@ app.get('/', (req, res) => {
 // app.post('/your-route-here', (req, res) => {
 //
 // });
+
+// Returns an error message, or null if the date is OK
+function validateApodDate(date) {
+    if (date === undefined) return null; // no date means today
+
+    if (typeof date !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(date)) {
+        return 'Date must look like YYYY-MM-DD.';
+    }
+
+    // new Date() quietly rolls Feb 30 over to Mar 2, so convert it
+    // back to text and check that it did not change
+    const parsed = new Date(date + 'T00:00:00Z');
+    if (isNaN(parsed) || parsed.toISOString().slice(0, 10) !== date) {
+        return 'That is not a real date.';
+    }
+
+    if (date < '1995-06-16') {
+        return 'The first picture is from 1995-06-16.';
+    }
+
+    const today = new Date().toISOString().slice(0, 10);
+    if (date > today) {
+        return 'That date is in the future.';
+    }
+
+    return null;
+}
+app.get('/api/space', async (req, res) => {
+    const { date } = req.query;
+    //date validation
+    const cacheKey = date || 'today';
+    const cached = apodCache.get(cacheKey);
+    const isFresh = cacheKey !== 'today' || Date.now() - cached?.savedAt < TODAY_MAX_AGE;
+
+    if (cached && isFresh) {
+        console.log('Cache hit:', cacheKey);
+        return res.json(cached.data);
+    }
+
+    const dateError = validateApodDate(date);
+    if (dateError) {
+        return res.status(400).json({ error: dateError });
+    }
+    if (!process.env.NASA_API_KEY) {
+        throw new Error('NASA_API_KEY is missing from .env');
+    }
+
+    // NASA has one address for the latest pictures, and another for one day.
+    // The one-day address uses the date as YYMMDD: 2025-07-04 becomes 250704
+    let address = 'https://science.nasa.gov/wp-json/wp/v2/apod-basic/';
+    if (date) {
+        const shortDate = date.slice(2).replaceAll('-', '');
+        address = address + shortDate;
+    }
+
+    // Add the secret key on the server
+    const nasaUrl = new URL(address);
+    nasaUrl.searchParams.set('api_key', process.env.NASA_API_KEY);
+
+    let nasaResponse;
+    try {
+        // Give up if NASA takes longer than 8 seconds
+        nasaResponse = await fetch(nasaUrl, { signal: AbortSignal.timeout(8000) });
+    } catch (err) {
+        return res.status(502).json({ error: 'Could not reach NASA. Try again later.' });
+    }
+
+    if (nasaResponse.status === 404) {
+        return res.status(404).json({ error: 'NASA has no picture for that date.' });
+    }
+    if (!nasaResponse.ok) {
+        console.error('NASA error:', nasaResponse.status);
+        return res.status(502).json({ error: 'NASA could not send a picture right now.' });
+    }
+
+    const data = await nasaResponse.json();
+
+    // With a date, NASA sends one picture. Without one, it sends a list,
+    // and the first item is the newest.
+    const picture = Array.isArray(data) ? data[0] : data;
+
+    // Send back only what our page needs, with names we chose
+    const result = {
+        title: picture.title,
+        date: picture.date,
+        imageUrl: picture.hdurl,
+        description: picture.alt,
+        nasaPage: picture.permalink
+    };
+
+    apodCache.set(cacheKey, { data: result, savedAt: Date.now() });
+
+    // Too many entries? Remove the oldest one (a Map remembers insertion order)
+    if (apodCache.size > MAX_CACHE_SIZE) {
+        const oldestKey = apodCache.keys().next().value;
+        apodCache.delete(oldestKey);
+    }
+
+    res.json(result);
+});
+
 
 // ==========================================
 // STATIC FILES
