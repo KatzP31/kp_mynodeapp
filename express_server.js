@@ -1,5 +1,14 @@
 require('dotenv').config();
 
+// Stop immediately if any required setting is missing
+const REQUIRED_ENV = ['SESSION_SECRET', 'APP_PASSWORD', 'NASA_API_KEY'];
+for (const name of REQUIRED_ENV) {
+    if (!process.env[name]) {
+        console.error(`Missing ${name} in .env (or in Render's Environment settings)`);
+        process.exit(1);
+    }
+}
+
 const express = require('express');
 const session = require('express-session');
 const rateLimit = require('express-rate-limit');
@@ -38,6 +47,9 @@ const LOG_FILE = path.join(__dirname, 'server.log');
 let visitorCount = 0;
 
 let MAINTENANCE_MODE = false;
+
+const isProduction = process.env.NODE_ENV === 'production';
+
 
 // Trim the log file if it's gotten too big
 if (fs.existsSync(LOG_FILE) && fs.statSync(LOG_FILE).size > 128 * 1024) {
@@ -89,7 +101,12 @@ app.use((req, res, next) => {
 const limiter = rateLimit({
     windowMs: 10 * 1000, // 10 second window
     limit: 100,          // max requests per window, per IP
-    message: '<h1>429 Too Many Requests</h1><p>Please wait 10 seconds.</p>'
+    message: { error: 'Too many requests. Please wait 10 seconds.' }
+});
+const authLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000,
+    limit: 10,
+    message: { error: 'Too many login attempts. Please wait 15 minutes and try again.' }
 });
 app.use(limiter);
 
@@ -101,17 +118,28 @@ app.use((req, res, next) => {
 // Tracks logged-in users via a signed cookie - the browser sends it back
 // automatically, no frontend code needed. Requires SESSION_SECRET in .env.
 app.use(session({
-    secret: process.env.SESSION_SECRET || 'fallback_secret',
+    secret: process.env.SESSION_SECRET,
     resave: false,
     saveUninitialized: false,
-    cookie: { maxAge: 15 * 60 * 1000 } // session expires after 15 minutes
+    cookie: {
+        maxAge: 15 * 60 * 1000,   // 15 minutes
+        httpOnly: true,           // page JavaScript cannot read it
+        sameSite: 'lax',          // other sites cannot send it with their forms
+        secure: isProduction      // only sent over HTTPS on the live site
+    }
 }));
 
-// Route guard - use this on any route that should require login.
-// Example: app.get('/dashboard', requireAuth, (req, res) => { ... });
 function requireAuth(req, res, next) {
     if (!req.session.isAuthenticated) {
         return res.status(401).json({ error: 'Please log in first.' });
+    }
+    next();
+}
+
+// For pages: people get sent to the login page
+function requireLoginPage(req, res, next) {
+    if (!req.session.isAuthenticated) {
+        return res.redirect('/');
     }
     next();
 }
@@ -132,16 +160,23 @@ app.get('/api/stats', (req, res) => {
 });
 
 // Checks the password against .env; marks the session authenticated if correct
-app.post('/login', (req, res) => {
+app.post('/login', authLimiter, (req, res) => {
     const { password, rememberMe } = req.body;
+
     if (password === process.env.APP_PASSWORD) {
         req.session.isAuthenticated = true;
+
         if (rememberMe) {
             req.session.cookie.maxAge = 7 * 24 * 60 * 60 * 1000; // 7 days
         }
+
         return res.json({ success: true });
     }
-    res.status(401).json({ success: false, error: 'Incorrect password' });
+
+    res.status(401).json({
+        success: false,
+        error: 'Incorrect password'
+    });
 });
 
 // Logout - destroys the session so req.session.isAuthenticated is gone
@@ -154,18 +189,24 @@ app.post('/logout', (req, res) => {
 });
 
 // Example protected route - try visiting this without logging in first
-app.get('/dashboard', requireAuth, (req, res) => {
+// app.get('/dashboard', requireAuth, (req, res) => {
+//     res.sendFile(path.join(PUBLIC_DIR, 'dashboard.html'));
+// });
+app.get('/dashboard', requireLoginPage, (req, res) => {
     res.sendFile(path.join(PUBLIC_DIR, 'dashboard.html'));
 });
 
-app.get('/api/headers-demo', (req, res) => {
-    res.set('X-Student-Name', 'Katz Paniagua');
-    res.json({
-        browser: req.get('User-Agent'),
-        languages: req.get('Accept-Language'),
-        allRequestHeaders: req.headers
+// Practice routes: only available on your own computer
+if (!isProduction) {
+    app.get('/api/headers-demo', (req, res) => {
+        res.set('X-Student-Name', 'Katz Paniagua');
+        res.json({
+            browser: req.get('User-Agent'),
+            languages: req.get('Accept-Language'),
+            allRequestHeaders: req.headers
+        });
     });
-});
+}
 app.get('/api/whoami', (req, res) => {
     res.json({ loggedIn: !!req.session.isAuthenticated });
 });
@@ -177,7 +218,10 @@ app.get('/projects', (req, res) => {
     res.sendFile(path.join(PUBLIC_DIR, 'projects.html'));
 });
 
-app.get('/guestbook', requireAuth, (req, res) => {
+// app.get('/guestbook', requireAuth, (req, res) => {
+//     res.sendFile(path.join(PUBLIC_DIR, 'guestbook.html'));
+// });
+app.get('/guestbook', requireLoginPage, (req, res) => {
     res.sendFile(path.join(PUBLIC_DIR, 'guestbook.html'));
 });
 
@@ -341,8 +385,10 @@ app.get('/api/space', async (req, res) => {
 
     res.json(result);
 });
-
-
+// Lets Render (or anyone) check that the server is running
+app.get('/health', (req, res) => {
+    res.json({ status: 'ok' });
+});
 // ==========================================
 // STATIC FILES
 // Serves everything in /public (put this AFTER your routes)
