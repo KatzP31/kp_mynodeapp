@@ -1,5 +1,5 @@
 require('dotenv').config();
-
+const db = require('./db');
 // Stop immediately if any required setting is missing
 const REQUIRED_ENV = ['SESSION_SECRET', 'APP_PASSWORD', 'NASA_API_KEY'];
 for (const name of REQUIRED_ENV) {
@@ -57,12 +57,12 @@ if (fs.existsSync(LOG_FILE) && fs.statSync(LOG_FILE).size > 128 * 1024) {
     fs.writeFileSync(LOG_FILE, recentLines.join('\n'));
 }
 
-const GUESTBOOK_FILE = path.join(__dirname, 'guestbook.json');
+// const GUESTBOOK_FILE = path.join(__dirname, 'guestbook.json');
 
-function getGuestbookMessages() {
-    if (!fs.existsSync(GUESTBOOK_FILE)) return [];
-    return JSON.parse(fs.readFileSync(GUESTBOOK_FILE, 'utf8'));
-}
+// function getGuestbookMessages() {
+//     if (!fs.existsSync(GUESTBOOK_FILE)) return [];
+//     return JSON.parse(fs.readFileSync(GUESTBOOK_FILE, 'utf8'));
+// }
 
 function validateEntry(name, msg) {
     if (typeof name !== 'string' || typeof msg !== 'string') {
@@ -218,69 +218,67 @@ app.get('/projects', (req, res) => {
     res.sendFile(path.join(PUBLIC_DIR, 'projects.html'));
 });
 
-// app.get('/guestbook', requireAuth, (req, res) => {
-//     res.sendFile(path.join(PUBLIC_DIR, 'guestbook.html'));
-// });
+
 app.get('/guestbook', requireLoginPage, (req, res) => {
     res.sendFile(path.join(PUBLIC_DIR, 'guestbook.html'));
 });
-
-app.get('/api/guestbook', requireAuth, (req, res) => {
-    res.json(getGuestbookMessages());
+// READ ALL
+app.get('/api/guestbook', requireAuth, async (req, res) => {
+    const entries = await db.getAllEntries();
+    res.json(entries);
 });
-
-// // app.post('/api/guestbook', requireAuth, (req, res) => {
-// //     const { msg } = req.body;
-// //     if (!msg) {
-// //         return res.status(400).json({ error: 'Message is required' });
-// //     }
-// //     const messages = getGuestbookMessages();
-
-// //     const cleanedInput = msg.replace(/\s+/g, '').trim();
-// //     const compactInput = cleanedInput.replace(/\s+/g, '');
-// //     if (filter.isProfane(compactInput)) {
-// //         return res.status(400).json({ error: 'Message contains profanity' });
-// //     }
-// //     messages.push(cleanedInput);
-
-// //     fs.writeFileSync(GUESTBOOK_FILE, JSON.stringify(messages.slice(-10), null, 2));
-// //     res.json({ success: true });
-// // });
-app.post('/api/guestbook', requireAuth, (req, res) => {
+// READ ONE
+app.get('/api/guestbook/:id', requireAuth, async (req, res) => {
+    const entry = await db.getEntryById(req.params.id);
+    if (!entry) {
+        return res.status(404).json({ error: 'Entry not found.' });
+    }
+    res.json(entry);
+});
+// CREATE
+app.post('/api/guestbook', requireAuth, async (req, res) => {
     const { name, msg } = req.body;
-
     const error = validateEntry(name, msg);
     if (error) {
-        return res.status(400).json({ error: error });
+        return res.status(400).json({ error });
     }
-
-    const messages = getGuestbookMessages();
-    // const cleanedInput = msg.replace(/\s+/g, '').trim();
-    // const compactInput = cleanedInput.replace(/\s+/g, '');
-    const cleanedInput = msg.trim();
-    const compactInput = cleanedInput.replace(/\s+/g, '');
-    if (filter.isProfane(compactInput)) {
-        return res.status(400).json({ error: 'Message contains profanity' });
+    if (filter.isProfane(msg)) {
+        return res.status(400).json({ error: 'Please keep your message friendly.' });
     }
-
-    const entry = {
-        id: crypto.randomUUID(),
-        name: name.trim(),
-        msg: cleanedInput,
-        createdAt: new Date().toISOString()
-    };
-
-    messages.push(entry);
-    fs.writeFileSync(GUESTBOOK_FILE, JSON.stringify(messages.slice(-50), null, 2));
+    const entry = await db.addEntry({ name: name.trim(), msg: msg.trim() });
     res.status(201).json(entry);
 });
+// DELETE
+app.delete('/api/guestbook/:id', requireAuth, async (req, res) => {
+    const deleted = await db.deleteEntry(req.params.id);
+    if (!deleted) {
+        return res.status(404).json({ error: 'Entry not found.' });
+    }
+    res.status(204).end();
+});// UPDATE
+app.put('/api/guestbook/:id', requireAuth, async (req, res) => {
+    const { name, msg } = req.body;
+    const error = validateEntry(name, msg);
+    if (error) {
+        return res.status(400).json({ error });
+    }
 
+    const updated = await db.updateEntry(req.params.id, {
+        name: name.trim(),
+        msg: msg.trim()
+    });
+    if (!updated) {
+        return res.status(404).json({ error: 'Entry not found.' });
+    }
+    res.json(updated);
+});
 
 app.get('/', (req, res) => {
     visitorCount++;
     console.log(`Visit #${visitorCount}: someone viewed the landing page`);
     res.sendFile(path.join(PUBLIC_DIR, 'index.html'));
 });
+
 
 // app.post('/your-route-here', (req, res) => {
 //

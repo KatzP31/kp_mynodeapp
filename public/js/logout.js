@@ -1,4 +1,4 @@
-const logoutButton = document.querySelector('#logout-button');
+// const logoutButton = document.querySelector('#logout-button');
 
 logoutButton.addEventListener('click', async () => {
     try {
