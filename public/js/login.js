@@ -1,3 +1,4 @@
+const username = document.querySelector('#username').value;
 const status = document.querySelector('#status');
 const loginForm = document.querySelector('#login-form');
 const loginMessage = document.querySelector('#login-message');
@@ -8,15 +9,22 @@ async function checkAuthState() {
     try {
         const response = await fetch('/api/whoami');
         const data = await response.json();
-
+        body: JSON.stringify({ username, password, rememberMe })
         if (data.loggedIn) {
-            status.innerHTML =
-                '<h1>Welcome back!</h1>';
+            // status.innerHTML =
+            //     '<h1>Welcome back!</h1>';
+            status.textContent = '';
+            const heading = document.createElement('h1');
+            heading.textContent = `Welcome back, ${data.username}!`;
+            status.append(heading);
             loginSection.hidden = true;
             logoutButton.hidden = false;
         } else {
-            status.innerHTML = '<h1>Welcome!</h1>';
-
+            // status.innerHTML = '<h1>Welcome!</h1>';
+            status.textContent = '';
+            const heading = document.createElement('h1');
+            heading.textContent = `Welcome back, ${data.username}!`;
+            status.append(heading);
             loginSection.hidden = false;
             logoutButton.hidden = true;
         }

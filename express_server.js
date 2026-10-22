@@ -1,7 +1,9 @@
 require('dotenv').config();
 const db = require('./db');
+const bcrypt = require('bcryptjs');
+
 // Stop immediately if any required setting is missing
-const REQUIRED_ENV = ['SESSION_SECRET', 'APP_PASSWORD', 'NASA_API_KEY'];
+const REQUIRED_ENV = ['SESSION_SECRET', 'NASA_API_KEY', 'ADMIN_PASSWORD', 'ADMIN_USERNAME'];
 for (const name of REQUIRED_ENV) {
     if (!process.env[name]) {
         console.error(`Missing ${name} in .env (or in Render's Environment settings)`);
@@ -76,6 +78,32 @@ function validateEntry(name, msg) {
     }
     return null;
 }
+function validateCredentials(username, password) {
+    if (typeof username !== 'string' || typeof password !== 'string') {
+        return 'Username and password must be text.';
+    }
+    if (!/^[a-z0-9_]{3,20}$/.test(username.trim().toLowerCase())) {
+        return 'Username must be 3 to 20 letters, numbers or underscores.';
+    }
+    if (password.length < 8 || password.length > 72) {
+        return 'Password must be 8 to 72 characters.';
+    }
+    return null;
+}
+function startSession(req, user, rememberMe) {
+    return new Promise((resolve, reject) => {
+        req.session.regenerate((err) => {
+            if (err) return reject(err);
+            req.session.userId = user.id;
+            req.session.username = user.username;
+            req.session.role = user.role;
+            if (rememberMe) {
+                req.session.cookie.maxAge = 7 * 24 * 60 * 60 * 1000; // 7 days
+            }
+            resolve();
+        });
+    });
+}
 // ==========================================
 // MIDDLEWARE SETUP
 // Each function below runs on every request, then calls next() to pass
@@ -130,7 +158,7 @@ app.use(session({
 }));
 
 function requireAuth(req, res, next) {
-    if (!req.session.isAuthenticated) {
+    if (!req.session.userId) {
         return res.status(401).json({ error: 'Please log in first.' });
     }
     next();
@@ -138,7 +166,14 @@ function requireAuth(req, res, next) {
 
 // For pages: people get sent to the login page
 function requireLoginPage(req, res, next) {
-    if (!req.session.isAuthenticated) {
+    if (!req.session.userId) {
+        return res.redirect('/');
+    }
+    next();
+}
+// For admin-only pages: everyone else goes back to the home page
+function requireAdminPage(req, res, next) {
+    if (req.session.role !== 'admin') {
         return res.redirect('/');
     }
     next();
@@ -160,23 +195,22 @@ app.get('/api/stats', (req, res) => {
 });
 
 // Checks the password against .env; marks the session authenticated if correct
-app.post('/login', authLimiter, (req, res) => {
-    const { password, rememberMe } = req.body;
-
-    if (password === process.env.APP_PASSWORD) {
-        req.session.isAuthenticated = true;
-
-        if (rememberMe) {
-            req.session.cookie.maxAge = 7 * 24 * 60 * 60 * 1000; // 7 days
-        }
-
-        return res.json({ success: true });
+app.post('/login', authLimiter, async (req, res) => {
+    const { username, password, rememberMe } = req.body;
+    if (typeof username !== 'string' || typeof password !== 'string') {
+        return res.status(400).json({ error: 'Username and password are required.' });
     }
 
-    res.status(401).json({
-        success: false,
-        error: 'Incorrect password'
-    });
+    const user = await db.getUserByUsername(username.trim());
+    const passwordOk = user && await bcrypt.compare(password, user.passwordHash);
+
+    if (!passwordOk) {
+        // Same message whether the username or the password was wrong
+        return res.status(401).json({ error: 'Incorrect username or password.' });
+    }
+
+    await startSession(req, user, rememberMe);
+    res.json({ success: true, username: user.username });
 });
 
 // Logout - destroys the session so req.session.isAuthenticated is gone
@@ -192,7 +226,8 @@ app.post('/logout', (req, res) => {
 // app.get('/dashboard', requireAuth, (req, res) => {
 //     res.sendFile(path.join(PUBLIC_DIR, 'dashboard.html'));
 // });
-app.get('/dashboard', requireLoginPage, (req, res) => {
+// app.get('/dashboard', requireLoginPage, (req, res) => {
+app.get('/dashboard', requireAdminPage, (req, res) => {
     res.sendFile(path.join(PUBLIC_DIR, 'dashboard.html'));
 });
 
@@ -208,7 +243,15 @@ if (!isProduction) {
     });
 }
 app.get('/api/whoami', (req, res) => {
-    res.json({ loggedIn: !!req.session.isAuthenticated });
+    if (!req.session.userId) {
+        return res.json({ loggedIn: false });
+    }
+    res.json({
+        loggedIn: true,
+        userId: req.session.userId,
+        username: req.session.username,
+        role: req.session.role
+    });
 });
 
 // Example: run code (logging, a counter, etc.) before serving a page from /public
@@ -387,6 +430,24 @@ app.get('/api/space', async (req, res) => {
 app.get('/health', (req, res) => {
     res.json({ status: 'ok' });
 });
+app.post('/register', authLimiter, async (req, res) => {
+    const { username, password } = req.body;
+    const error = validateCredentials(username, password);
+    if (error) {
+        return res.status(400).json({ error });
+    }
+
+    const cleanName = username.trim().toLowerCase();
+    if (await db.getUserByUsername(cleanName)) {
+        return res.status(409).json({ error: 'That username is already taken.' });
+    }
+
+    const passwordHash = await bcrypt.hash(password, 12);
+    const user = await db.addUser({ username: cleanName, passwordHash });
+
+    await startSession(req, user); // new users are logged in right away
+    res.status(201).json({ username: user.username });
+});
 // ==========================================
 // STATIC FILES
 // Serves everything in /public (put this AFTER your routes)
@@ -418,7 +479,17 @@ app.use((err, req, res, next) => {
     }
     res.status(status).send('<h1>Something went wrong</h1><p>Please try again later.</p><a href="/">Back to home</a>');
 });
-app.listen(PORT, () => console.log(`Server live on http://localhost:${PORT}`));
+async function ensureAdmin() {
+    const existing = await db.getUserByUsername(process.env.ADMIN_USERNAME);
+    if (existing) return;
 
+    const passwordHash = await bcrypt.hash(process.env.ADMIN_PASSWORD, 12);
+    await db.addUser({ username: process.env.ADMIN_USERNAME, passwordHash, role: 'admin' });
+    console.log('Created admin account');
+}
+// app.listen(PORT, () => console.log(`Server live on http://localhost:${PORT}`));
+ensureAdmin().then(() => {
+    app.listen(PORT, () => console.log(`Server live on http://localhost:${PORT}`));
+});
 
 

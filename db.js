@@ -2,8 +2,7 @@
 // db.js - the ONLY file that knows how guestbook data is stored
 const fs = require('fs/promises');
 const path = require('path');
-// const crypto = require('crypto');
-const db = require('./db');
+const crypto = require('crypto');
 
 const GUESTBOOK_FILE = path.join(__dirname, 'guestbook.json');
 const MAX_ENTRIES = 50;
@@ -24,6 +23,40 @@ async function writeAll(entries) {
     await fs.writeFile(GUESTBOOK_FILE, JSON.stringify(entries, null, 2));
 }
 
+const USERS_FILE = path.join(__dirname, 'users.json');
+
+async function readAll(file = GUESTBOOK_FILE) {
+    try {
+        const text = await fs.readFile(file, 'utf8');
+        return JSON.parse(text);
+    } catch (err) {
+        if (err.code === 'ENOENT') return [];
+        throw err;
+    }
+}
+
+async function getUserByUsername(username) {
+    const users = await readAll(USERS_FILE);
+    return users.find(u => u.username === username.toLowerCase()) || null;
+}
+
+// Takes a passwordHash, never a password
+async function addUser({ username, passwordHash, role = 'user' }) {
+    const users = await readAll(USERS_FILE);
+    const user = {
+        id: crypto.randomUUID(),
+        username: username.toLowerCase(),
+        passwordHash,
+        role,
+        createdAt: new Date().toISOString()
+    };
+    users.push(user);
+    await writeAll(users, USERS_FILE);
+    return user;
+}
+async function writeAll(data, file = GUESTBOOK_FILE) {
+    await fs.writeFile(file, JSON.stringify(data, null, 2));
+}
 // ----- Public functions (exported) -----
 
 async function getAllEntries() {
@@ -69,4 +102,7 @@ async function deleteEntry(id) {
     return true;
 }
 
-module.exports = { getAllEntries, getEntryById, addEntry, updateEntry, deleteEntry };
+module.exports = {
+    getAllEntries, getEntryById, addEntry, updateEntry, deleteEntry,
+    getUserByUsername, addUser
+};

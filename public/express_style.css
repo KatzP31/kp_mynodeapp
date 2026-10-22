@@ -1485,3 +1485,38 @@ h1 {
         text-align: center;
     }
 }
+
+/* Username input */
+#username {
+    width: 100%;
+    padding: 13px 15px;
+
+    border: 2px solid var(--purple);
+    border-radius: 12px;
+
+    background: white;
+    color: #222;
+
+    font-family: inherit;
+    font-size: 1rem;
+
+    transition: box-shadow 0.2s ease;
+}
+
+#username:focus {
+    outline: none;
+    box-shadow: 0 0 0 4px rgba(106, 63, 191, 0.15);
+}
+
+#username::placeholder {
+    color: #888;
+}
+
+body.dark-mode #username {
+    background: #3d1046;
+    color: white;
+}
+
+body.dark-mode #username::placeholder {
+    color: #bbb;
+}
