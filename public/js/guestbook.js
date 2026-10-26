@@ -1,3 +1,5 @@
+let currentUser = null;
+
 async function deleteEntry(id) {
     if (!confirm('Delete this message?')) return;
 
@@ -32,7 +34,6 @@ async function saveEdit(entry, newMsg) {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({
-                name: entry.name,
                 msg: newMsg
             })
         });
@@ -71,7 +72,6 @@ function startEdit(li, entry) {
     cancelButton.addEventListener('click', loadMessages);
 
     li.append(textarea, saveButton, cancelButton);
-
     textarea.focus();
 }
 
@@ -80,6 +80,17 @@ async function loadMessages() {
     listError.textContent = '';
 
     try {
+        if (!currentUser) {
+            const userResponse = await fetch('/api/whoami');
+            currentUser = await userResponse.json();
+
+            if (!userResponse.ok) {
+                listError.textContent =
+                    currentUser.error || 'Could not identify the current user.';
+                return;
+            }
+        }
+
         const response = await fetch('/api/guestbook');
         const data = await response.json().catch(() => ({}));
 
@@ -113,25 +124,30 @@ async function loadMessages() {
                 li.append(edited);
             }
 
-            const editButton = document.createElement('button');
-            editButton.type = 'button';
-            editButton.textContent = 'Edit';
-            editButton.addEventListener('click', () =>
-                startEdit(li, entry)
-            );
+            const canEdit =
+                entry.authorId === currentUser.userId ||
+                currentUser.role === 'admin';
 
-            const deleteButton = document.createElement('button');
-            deleteButton.type = 'button';
-            deleteButton.textContent = 'Delete';
-            deleteButton.addEventListener('click', () =>
-                deleteEntry(entry.id)
-            );
+            if (canEdit) {
+                const editButton = document.createElement('button');
+                editButton.type = 'button';
+                editButton.textContent = 'Edit';
+                editButton.addEventListener('click', () =>
+                    startEdit(li, entry)
+                );
 
-            li.append(editButton, deleteButton);
+                const deleteButton = document.createElement('button');
+                deleteButton.type = 'button';
+                deleteButton.textContent = 'Delete';
+                deleteButton.addEventListener('click', () =>
+                    deleteEntry(entry.id)
+                );
+
+                li.append(editButton, deleteButton);
+            }
 
             list.append(li);
         });
-
     } catch (err) {
         listError.textContent =
             'Could not reach the server. Check your connection.';
@@ -151,7 +167,6 @@ document.querySelector('#guestbook-form').addEventListener('submit', async (e) =
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({
-                name: document.querySelector('#name').value,
                 msg: document.querySelector('#msg').value
             })
         });
@@ -164,14 +179,12 @@ document.querySelector('#guestbook-form').addEventListener('submit', async (e) =
             return;
         }
 
+        e.target.reset();
+        await loadMessages();
     } catch (err) {
         errorBox.textContent =
             'Could not reach the server. Check your connection.';
-        return;
     }
-
-    e.target.reset();
-    loadMessages();
 });
 
 loadMessages();

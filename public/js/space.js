@@ -2,16 +2,13 @@ const form = document.querySelector('#space-form');
 const dateInput = document.querySelector('#date');
 const statusBox = document.querySelector('#status');
 const result = document.querySelector('#result');
-
 // Don't let the date picker choose future dates
 dateInput.max = new Date().toISOString().slice(0, 10);
 
 async function loadPicture(date) {
     statusBox.textContent = 'Loading...';
     result.hidden = true;
-
     const url = date ? `/api/space?date=${encodeURIComponent(date)}` : '/api/space';
-
     try {
         const response = await fetch(url);
         const data = await response.json().catch(() => ({}));
@@ -41,10 +38,8 @@ function showPicture(data) {
 
     result.hidden = false;
 }
-
 form.addEventListener('submit', (e) => {
     e.preventDefault();
     loadPicture(dateInput.value);
 });
-
 loadPicture(); // show the latest picture when the page opens

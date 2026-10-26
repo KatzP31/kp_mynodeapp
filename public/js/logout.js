@@ -1,5 +1,3 @@
-// const logoutButton = document.querySelector('#logout-button');
-
 logoutButton.addEventListener('click', async () => {
     try {
         const response = await fetch('/logout', {

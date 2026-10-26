@@ -1,9 +1,7 @@
 const message = document.querySelector('#register-message');
-
 document.querySelector('#register-form').addEventListener('submit', async (e) => {
     e.preventDefault();
     message.textContent = '';
-
     const username = document.querySelector('#username').value;
     const password = document.querySelector('#password').value;
     const confirm = document.querySelector('#confirm').value;
@@ -12,7 +10,6 @@ document.querySelector('#register-form').addEventListener('submit', async (e) =>
         message.textContent = 'Passwords do not match.';
         return;
     }
-
     try {
         const response = await fetch('/register', {
             method: 'POST',

@@ -1,10 +1,10 @@
-const username = document.querySelector('#username').value;
+
 const status = document.querySelector('#status');
 const loginForm = document.querySelector('#login-form');
+
 const loginMessage = document.querySelector('#login-message');
 const loginSection = document.querySelector('#login-section');
 const logoutButton = document.querySelector('#logout-button');
-
 async function checkAuthState() {
     try {
         const response = await fetch('/api/whoami');
@@ -30,19 +30,16 @@ async function checkAuthState() {
         }
     } catch (error) {
         console.error('Auth check failed:', error);
-
         status.innerHTML = '<h1>Welcome!</h1>';
         loginSection.hidden = false;
         logoutButton.hidden = true;
     }
 }
-
 loginForm.addEventListener('submit', async (event) => {
     event.preventDefault();
-
+    const username = document.querySelector('#username').value;
     const password = document.querySelector('#password').value;
     const rememberMe = event.target.rememberMe.checked;
-
     try {
         const response = await fetch('/login', {
             method: 'POST',
@@ -50,11 +47,11 @@ loginForm.addEventListener('submit', async (event) => {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({
+                username,
                 password,
                 rememberMe
             })
         });
-
         const data = await response.json().catch(() => ({
             success: false
         }));
@@ -77,5 +74,4 @@ loginForm.addEventListener('submit', async (event) => {
             'Something went wrong while logging in.';
     }
 });
-
 checkAuthState();
