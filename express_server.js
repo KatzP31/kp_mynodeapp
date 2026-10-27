@@ -119,6 +119,12 @@ const authLimiter = rateLimit({
     limit: 10,
     message: { error: 'Too many login attempts. Please wait 1 minute and try again.' }
 });
+const postLimiter = rateLimit({
+    windowMS: 60 * 1000, // 1min
+    limit: 3, //3 posts per min, per account
+    KeyGenerator: (req) => req.session.userId,
+    message: { error: 'You are posting too fast, please wait a minute.' }
+})
 app.use(limiter);
 app.use((req, res, next) => {
     if (MAINTENANCE_MODE) return res.status(503).send('Maintenance Mode.');

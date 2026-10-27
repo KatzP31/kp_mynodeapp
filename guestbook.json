@@ -68,23 +68,8 @@
   {
     "id": "f16350a0-4d34-4eed-8a9b-bd3c9dc6adb4",
     "name": "Maya",
-    "msg": "I edited this!",
+    "msg": "I edited this!1111",
     "createdAt": "2026-10-16T13:02:23.323Z",
-    "updatedAt": "2026-10-16T13:14:07.781Z"
-  },
-  {
-    "id": "36697430-4b13-43a0-ae09-f5d4d409ca08",
-    "name": "1234",
-    "msg": "10/23",
-    "authorId": "4394b1da-27b3-4981-8456-8382bd26fa6a",
-    "createdAt": "2026-10-23T12:38:26.644Z"
-  },
-  {
-    "id": "83f43243-5919-47ab-adb8-2d2519d20d5f",
-    "name": "1022",
-    "msg": "okokok edited!!!",
-    "authorId": "1b544787-382d-4d56-a9e7-c00e36c68276",
-    "createdAt": "2026-10-26T12:37:00.499Z",
-    "updatedAt": "2026-10-26T12:37:08.507Z"
+    "updatedAt": "2026-10-26T12:53:30.703Z"
   }
 ]
